@@ -79,6 +79,38 @@ public class Game2048 {
 		printGame();
 	}
 	//*************************************************************UpClick***********************
+	static void upClick(){
+		ArrayList<Integer> al = new ArrayList<Integer>();
+		for(int i=0;i<N;i++){
+			boolean flag=false;
+			for(int j=0;j<N;j++){
+				if(a[i][j]!=0){
+					if(!al.isEmpty()){
+						if(al.get(al.size()-1)==a[i][j] && flag==true){
+							flag=false;
+							int temp =2* al.get(al.size()-1);
+							al.remove(al.size()-1);
+							al.add(temp);
+						}
+						else{
+							flag=true;
+							al.add(a[i][j]);
+						}
+					}
+					else{
+						flag=true;
+						al.add(a[i][j]);
+					}
+				}
+			}
+			int k=0;
+			for(int j=0;j<N;j++,k++)
+				a[i][j] = k<al.size()?al.get(k):0;
+			al.clear();
+		}
+		randomGenrator();
+		printGame();
+	}
 	
 	//*************************************************************DownClick***********************
 	
