@@ -1,0 +1,120 @@
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
+
+
+public class Game2048 {
+	static int N=4;
+	static int a[][] = {{4,2,0,2},
+		 				{0,0,0,0},
+		 				{0,0,0,0},
+		 				{0,2,0,0}};
+	static long score = 0;
+	
+	//*************************************************************RightClick***********************
+	static void rigthClick(){
+		ArrayList<Integer> al = new ArrayList<Integer>();
+		for(int i=0;i<N;i++){
+			boolean flag=false;
+			for(int j=N-1;j>=0;j--){
+				if(a[i][j]!=0){
+					if(!al.isEmpty()){
+						if(al.get(al.size()-1)==a[i][j] && flag==true){
+							flag=false;
+							int temp =2* al.get(al.size()-1);
+							al.remove(al.size()-1);
+							al.add(temp);
+						}
+						else{
+							flag=true;
+							al.add(a[i][j]);
+						}
+					}
+					else{
+						flag=true;
+						al.add(a[i][j]);
+					}
+				}
+			}
+			int k=0;
+			for(int j=N-1;j>=0;j--,k++)
+				a[i][j] = k<al.size()?al.get(k):0;
+			al.clear();
+		}
+		randomGenrator();
+		printGame();
+	}
+	//*************************************************************LiftClick***********************
+	static void leftClick(){
+		ArrayList<Integer> al = new ArrayList<Integer>();
+		for(int i=0;i<N;i++){
+			boolean flag=false;
+			for(int j=0;j<N;j++){
+				if(a[i][j]!=0){
+					if(!al.isEmpty()){
+						if(al.get(al.size()-1)==a[i][j] && flag==true){
+							flag=false;
+							int temp =2* al.get(al.size()-1);
+							al.remove(al.size()-1);
+							al.add(temp);
+						}
+						else{
+							flag=true;
+							al.add(a[i][j]);
+						}
+					}
+					else{
+						flag=true;
+						al.add(a[i][j]);
+					}
+				}
+			}
+			int k=0;
+			for(int j=0;j<N;j++,k++)
+				a[i][j] = k<al.size()?al.get(k):0;
+			al.clear();
+		}
+		randomGenrator();
+		printGame();
+	}
+	//*************************************************************UpClick***********************
+	
+	//*************************************************************DownClick***********************
+	
+	//*************************************************************RandomGenrate***********************
+	static void randomGenrator(){
+		int temp = Math.random()>=0.9?4:2;
+		System.out.println();
+		boolean locationFound = false;
+        while(!locationFound) {
+            int x = new Random().nextInt(4);
+            int y = new Random().nextInt(4);
+            if (a[x][y]==0) {
+                a[x][y] = temp;
+                locationFound = true;
+            }
+        }
+	}
+	static void printGame(){
+		for(int i=0;i<N;i++){
+			System.out.println();
+			for(int j=0;j<N;j++)
+				System.out.print(a[i][j]+"  ");
+		}
+	}
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		while(true){
+			System.out.println();
+			int click = sc.nextInt();
+			if(click==1)
+				rigthClick();
+			else if(click==2)
+				leftClick();
+			else
+				break;
+		}
+		sc.close();
+	}
+}
