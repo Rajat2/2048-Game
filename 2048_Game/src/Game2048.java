@@ -8,22 +8,22 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Scanner;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.RepaintManager;
 import javax.swing.WindowConstants;
 
 
 
 public class Game2048 extends JPanel {
+	
+	private static final long serialVersionUID = 1L;
 	static int N=4;
-	static int a[][] = {{0,2,0,0},
-		 				{0,0,16,0},
-		 				{8,0,4096,2048},
-		 				{0,2,4,0}};
+	static int a[][] = {{0,1024,0,0},
+		 				{0,1024,0,0},
+		 				{0,0,0,0},
+		 				{0,0,0,0}};
 	static long score;
+	boolean won=true;
 	public Game2048(){
 		score = 0;
 		setFocusable(true);
@@ -65,8 +65,10 @@ public class Game2048 extends JPanel {
 		   y = y+110;
 		   x=20;
 	   }
+	   printScore(g, x+100, y+50);
 	}
 	
+	//*********************************************************************Creating tiles***************
 	 void drawRectangle(Graphics g1,int x,int y,int value){
 		int width = 90,height=90,curve=25;
 		Graphics2D g = ((Graphics2D) g1);
@@ -89,6 +91,31 @@ public class Game2048 extends JPanel {
 	      g.drawString(s, x + (width - w) / 2, y + width - (width - h) / 2 - 2);
 		
 	}
+	//*************************************************************Showing Score*********************
+	 void printScore(Graphics g1,int x,int y){
+		 Graphics2D g = (Graphics2D) g1;
+		    String s = "Score is:"+String.valueOf(score);
+		   if(isWon() && won==true){
+			   final Font font = new Font("Arial", Font.BOLD, 30);
+			    g.setFont(font);
+			   g.drawString("You Won! still you can continue", 10, y);
+			   won=false;
+		   }
+		   else{
+			   final Font font = new Font("Arial", Font.BOLD, 50);
+			    g.setFont(font);
+			   g.drawString(s, x, y);
+		   }
+	 }
+	 
+	 boolean isWon(){
+		 for(int i=0;i<N;i++)
+			 for(int j=0;j<N;j++)
+				 if(a[i][j]==2048)
+					 return true;
+		 
+		 return false;
+	 }
 	//*************************************************************RightClick***********************
 	static void rigthClick(){
 		ArrayList<Integer> al = new ArrayList<Integer>();
@@ -103,6 +130,7 @@ public class Game2048 extends JPanel {
 							int temp =2* al.get(al.size()-1);
 							al.remove(al.size()-1);
 							al.add(temp);
+							score+=temp;
 						}
 						else{
 							flag=true;
@@ -143,6 +171,7 @@ public class Game2048 extends JPanel {
 							int temp =2* al.get(al.size()-1);
 							al.remove(al.size()-1);
 							al.add(temp);
+							score+=temp;
 						}
 						else{
 							flag=true;
@@ -182,6 +211,7 @@ public class Game2048 extends JPanel {
 							int temp =2* al.get(al.size()-1);
 							al.remove(al.size()-1);
 							al.add(temp);
+							score+=temp;
 						}
 						else{
 							flag=true;
@@ -222,6 +252,7 @@ public class Game2048 extends JPanel {
 							int temp =2* al.get(al.size()-1);
 							al.remove(al.size()-1);
 							al.add(temp);
+							score+=temp;
 						}
 						else{
 							flag=true;
@@ -301,11 +332,13 @@ public class Game2048 extends JPanel {
 		JFrame game = new JFrame();
 	    game.setTitle("2048 Game");
 	    game.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-	    game.setSize(500, 500);
+	    game.setSize(500, 600);
 	    game.setResizable(false);
 	    game.add(new Game2048());
 	    game.setLocationRelativeTo(null);
 	    game.setVisible(true);
+	    randomGenrator();
+        randomGenrator();
 		/*Scanner sc = new Scanner(System.in);
 		System.out.println("Intital State");
 		//printGame();
