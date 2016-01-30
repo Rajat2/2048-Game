@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -8,6 +9,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Random;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
@@ -18,12 +20,17 @@ public class Game2048 extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	static int N=4;
-	static int a[][] = {{0,1024,0,0},
-		 				{0,1024,0,0},
+	static int a[][] = {{0,0,0,0},
+		 				{0,0,0,0},
 		 				{0,0,0,0},
 		 				{0,0,0,0}};
+	
+	static int flag=1;
+	static int previous[][] =new int[N][N];
+	static long previousScore;
 	static long score;
 	boolean won=true;
+	boolean lose=true;
 	public Game2048(){
 		score = 0;
 		setFocusable(true);
@@ -35,17 +42,24 @@ public class Game2048 extends JPanel {
 	        }
 	        switch (e.getKeyCode()) {
             case KeyEvent.VK_LEFT:
+            	setPreviousState();
               leftClick();
               break;
             case KeyEvent.VK_RIGHT:
+            	setPreviousState();
              rigthClick();
               break;
             case KeyEvent.VK_DOWN:
+            	setPreviousState();
               downClick();
               break;
             case KeyEvent.VK_UP:
+              setPreviousState();
               upClick();
               break;
+            case KeyEvent.VK_BACK_SPACE:
+            	printPreviousState();
+            	break;
           }
 	        repaint();
 	      }
@@ -66,6 +80,19 @@ public class Game2048 extends JPanel {
 		   x=20;
 	   }
 	   printScore(g, x+100, y+50);
+	}
+	//***********************strore Previous state***************************************************
+	void setPreviousState(){
+		for(int i=0;i<N;i++)
+			for(int j=0;j<N;j++)
+				previous[i][j] = a[i][j];
+		previousScore = score;
+	}
+	void printPreviousState(){
+		for(int i=0;i<N;i++)
+			for(int j=0;j<N;j++)
+				a[i][j] = previous[i][j];
+		score = previousScore;
 	}
 	
 	//*********************************************************************Creating tiles***************
@@ -94,17 +121,39 @@ public class Game2048 extends JPanel {
 	//*************************************************************Showing Score*********************
 	 void printScore(Graphics g1,int x,int y){
 		 Graphics2D g = (Graphics2D) g1;
-		    String s = "Score is:"+String.valueOf(score);
+		 g.setBackground(Color.BLACK);
+		 g.setColor(Color.DARK_GRAY);
+		 String s = "Score is:"+String.valueOf(score);
 		   if(isWon() && won==true){
 			   final Font font = new Font("Arial", Font.BOLD, 30);
-			    g.setFont(font);
-			   g.drawString("You Won! still you can continue", 10, y);
+			   g.setFont(font);
+			   g.drawString("You Won! still you can continue :)", 10, y);
 			   won=false;
 		   }
+		   else if(isLose() && lose==true){
+			   final Font font = new Font("Arial", Font.BOLD, 30);
+			   g.setFont(font);
+			   g.drawString("You Lost the game! Press any", 50, y);
+			   g.drawString(" cursor key to contiue :(", 100, y+40);
+			   for(int i=0;i<N;i++)
+				   for(int j=0;j<N;j++)
+					   a[i][j]=previous[i][j]=0;
+			   score=previousScore=0;
+			   randomGenrator();
+			   flag=1;
+		   }
 		   else{
-			   final Font font = new Font("Arial", Font.BOLD, 50);
+			    Font font = new Font("Arial", Font.BOLD, 50);
 			    g.setFont(font);
-			   g.drawString(s, x, y);
+			    g.drawString(s, x, y);
+			    font = new Font("Arial", Font.BOLD, 15);
+			    if(flag==1){
+			    g.setFont(font);
+			    g.drawString("Backspace for last state", x+150, y+20);
+			    g.drawString("Esc for exit", x+150, y+40);
+			    g.drawString("Else Arrow Keys", x+150, y+60);
+			    flag=0;
+			    }
 		   }
 	 }
 	 
@@ -115,6 +164,19 @@ public class Game2048 extends JPanel {
 					 return true;
 		 
 		 return false;
+	 }
+	 boolean isLose(){
+		 for(int i=0;i<N;i++)
+			 for(int j=1;j<N;j++)
+				 if(a[i][j-1]==a[i][j] || a[i][j]==0)
+					 return false;
+
+		 for(int i=0;i<N;i++)
+			 for(int j=1;j<N;j++)
+				 if(a[j-1][i]==a[j][i])
+					 return false;
+
+		 return true;
 	 }
 	//*************************************************************RightClick***********************
 	static void rigthClick(){
@@ -154,7 +216,6 @@ public class Game2048 extends JPanel {
 		}
 		if(stateChange)
 			randomGenrator();
-		//printGame();
 		
 	}
 	//*************************************************************LiftClick***********************
@@ -195,7 +256,6 @@ public class Game2048 extends JPanel {
 		}
 		if(stateChange)
 			randomGenrator();
-		//printGame();
 	}
 	//*************************************************************UpClick***********************
 	static void upClick(){
@@ -235,7 +295,6 @@ public class Game2048 extends JPanel {
 		}
 		if(stateChange)
 			randomGenrator();
-		//printGame();
 	}
 	
 	//*************************************************************DownClick***********************
@@ -276,7 +335,6 @@ public class Game2048 extends JPanel {
 		}
 		if(stateChange)
 			randomGenrator();
-		//printGame();
 	}
 	
 	//*************************************************************RandomGenrate***********************
@@ -293,18 +351,7 @@ public class Game2048 extends JPanel {
             }
         }
 	}
-	//*************************************************************Printing matrix***********************
-	/*static void printGame(){
-		for(int i=0;i<N;i++){
-			System.out.println();
-			for(int j=0;j<N;j++)
-				System.out.print(a[i][j]+"  ");
-		}
-	}*/
-	
-	
-
-	//************************************************************Tile Class**********
+//************************************************************Tile Class**********
 	  static class Tile {
 	    public static Color getForeground(int value) {
 	      return value < 16 ? new Color(0x776e65) :  new Color(0xf9f6f2);
@@ -339,24 +386,5 @@ public class Game2048 extends JPanel {
 	    game.setVisible(true);
 	    randomGenrator();
         randomGenrator();
-		/*Scanner sc = new Scanner(System.in);
-		System.out.println("Intital State");
-		//printGame();
-		System.out.println("Change State");
-		while(true){
-			System.out.println();
-			int click = sc.nextInt();
-			if(click==2)
-				rigthClick();
-			else if(click==1)
-				leftClick();
-			else if(click==3)
-				upClick();
-			else if(click==4)
-				downClick();
-			else
-				break;
-		}
-		sc.close();*/
 	}
 }
